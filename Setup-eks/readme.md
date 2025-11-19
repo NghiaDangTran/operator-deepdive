@@ -7,3 +7,7 @@ https://docs.aws.amazon.com/eks/latest/userguide/creating-a-vpc.html#_only_publi
 
 then create with eksctl
 eksctl create cluster --name operator-test --region ca-central-1 --version 1.33 --vpc-private-subnets subnet-ExampleID1,subnet-ExampleID2 --without-nodegroup
+
+
+
+

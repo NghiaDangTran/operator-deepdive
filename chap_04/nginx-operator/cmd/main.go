@@ -18,6 +18,7 @@ package main
 
 import (
 	"crypto/tls"
+	"embed"
 	"flag"
 	"os"
 	"path/filepath"
@@ -207,13 +208,6 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "NginxOperator")
-		os.Exit(1)
-	}
-	if err := (&controller.NginxReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Nginx")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

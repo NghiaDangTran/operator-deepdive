@@ -21,3 +21,22 @@ populated with various Kubernetes dependencies).
 Create api
 
 operator-sdk create api --group operator --version v1alpha1 --kind NginxOperator --resource --controller
+
+
+after change the 
+
+
+
+
+
+	// Port is the port number to expose on the Nginx Pod
+	// +kubebuilder:default=8080
+	// +kubebuilder:validation:Required
+	Port *int32 `json:"port,omitempty"`
+
+	// Replicas is the number of deployment repliceas to scale
+	Replicas *int32 `json:"replicas,omitempty"`
+
+	// ForceRedploy is any string, modifying this field
+	// instructs the Operator to redeploy the Operand
+	ForceRedploy string `json:"forceRedploy,omitempty"`

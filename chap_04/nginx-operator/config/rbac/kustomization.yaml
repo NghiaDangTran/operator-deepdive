@@ -22,9 +22,6 @@ resources:
 # default, aiding admins in cluster management. Those roles are
 # not used by the nginx-operator itself. You can comment the following lines
 # if you do not want those helpers be installed with your Project.
-- nginx_admin_role.yaml
-- nginx_editor_role.yaml
-- nginx_viewer_role.yaml
 - nginxoperator_admin_role.yaml
 - nginxoperator_editor_role.yaml
 - nginxoperator_viewer_role.yaml

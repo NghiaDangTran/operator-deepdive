@@ -47,10 +47,8 @@ type NginxOperatorReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
 func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
-
-	// TODO(user): your logic here
-
+	logger := logf.FromContext(ctx)
+	operatorCR := &operatorv1alpha1.NginxOperator{}
 	return ctrl.Result{}, nil
 }
 

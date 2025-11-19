@@ -3,7 +3,6 @@
 # It should be run by config/default
 resources:
 - bases/operator.example.com_nginxoperators.yaml
-- bases/operator.example.com_nginxes.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patches:
