@@ -19,10 +19,10 @@ package controller
 import (
 	"context"
 
-	// appsv1 "k8s.io/api/apps/v1"
-
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -53,24 +53,57 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	logger := logf.FromContext(ctx)
 	operatorCR := &operatorv1alpha1.NginxOperator{}
 	err := r.Get(ctx, req.NamespacedName, operatorCR)
-	if err != nil && errors.IsNotFound(err) {
-		// logger.Info("Operator resource object not found.")
-		deploymentManifest := assets.
-			GetDeploymentFromFile("manifests/nginx_deployment.yaml")
-		deploymentManifest.Spec.Replicas = operatorCR.Spec.Replicas
-		deploymentManifest.Spec.Template.Spec.Containers[0].Ports[0].
-			ContainerPort = *operatorCR.Spec.Port
-
-		// # this add the owner reference
-		ctrl.SetControllerReference(operatorCR, deploymentManifest, r.Scheme)
-		err = r.Update(ctx, deploymentManifest)
-		if err != nil {
-			logger.Error(err, "Error creating Nginx deployment.")
-			return ctrl.Result{}, err
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// The CR was deleted before we processed it. Nothing to do.
+			return ctrl.Result{}, nil
 		}
-		return ctrl.Result{}, nil
-	} else if err != nil {
 		logger.Error(err, "Error getting operator resource object")
+		return ctrl.Result{}, err
+	}
+
+	deploymentManifest := assets.GetDeploymentFromFile("manifests/nginx_deployment.yaml")
+	deploymentManifest.Namespace = operatorCR.Namespace
+
+	if operatorCR.Spec.Replicas != nil {
+		deploymentManifest.Spec.Replicas = operatorCR.Spec.Replicas
+	}
+
+	if operatorCR.Spec.Port != nil &&
+		len(deploymentManifest.Spec.Template.Spec.Containers) > 0 &&
+		len(deploymentManifest.Spec.Template.Spec.Containers[0].Ports) > 0 {
+		deploymentManifest.Spec.Template.Spec.Containers[0].
+			Ports[0].ContainerPort = *operatorCR.Spec.Port
+	}
+
+	if err := ctrl.SetControllerReference(operatorCR, deploymentManifest, r.Scheme); err != nil {
+		logger.Error(err, "Error setting owner reference on deployment")
+		return ctrl.Result{}, err
+	}
+
+	if err := r.Create(ctx, deploymentManifest); err != nil {
+		if errors.IsAlreadyExists(err) {
+			existingDeployment := &appsv1.Deployment{}
+			if getErr := r.Get(
+				ctx,
+				types.NamespacedName{
+					Namespace: deploymentManifest.Namespace,
+					Name:      deploymentManifest.Name,
+				},
+				existingDeployment,
+			); getErr != nil {
+				logger.Error(getErr, "Error fetching existing Nginx deployment")
+				return ctrl.Result{}, getErr
+			}
+
+			existingDeployment.Spec = deploymentManifest.Spec
+			if updateErr := r.Update(ctx, existingDeployment); updateErr != nil {
+				logger.Error(updateErr, "Error updating Nginx deployment.")
+				return ctrl.Result{}, updateErr
+			}
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Error creating Nginx deployment.")
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil

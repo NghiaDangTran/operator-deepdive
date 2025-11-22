@@ -18,7 +18,6 @@ package main
 
 import (
 	"crypto/tls"
-	"embed"
 	"flag"
 	"os"
 	"path/filepath"

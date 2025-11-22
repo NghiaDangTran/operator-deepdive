@@ -11,3 +11,12 @@ eksctl create cluster --name operator-test --region ca-central-1 --version 1.33 
 
 
 
+
+
+scale 
+
+eksctl scale nodegroup \
+  --cluster operator-test \
+  --region ca-central-1 \
+  --name operator-ng \
+  --nodes 2
