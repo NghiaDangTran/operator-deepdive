@@ -19,4 +19,4 @@ eksctl scale nodegroup \
   --cluster operator-test \
   --region ca-central-1 \
   --name operator-ng \
-  --nodes 2
+  --nodes 0

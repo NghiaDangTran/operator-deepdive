@@ -23,6 +23,13 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+const (
+	ReasonCRNotAvailable          = "OperatorResourceNotAvailable"
+	ReasonDeploymentNotAvailable  = "OperandDeploymentNotAvailable"
+	ReasonOperandDeploymentFailed = "OperandDeploymentFailed"
+	ReasonSucceeded               = "OperatorSucceeded"
+)
+
 // NginxOperatorSpec defines the desired state of NginxOperator.
 type NginxOperatorSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -45,6 +52,7 @@ type NginxOperatorSpec struct {
 type NginxOperatorStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Conditions []metav1.Condition `json:"conditions"`
 }
 
 // +kubebuilder:object:root=true
