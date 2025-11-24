@@ -20,3 +20,31 @@ eksctl scale nodegroup \
   --region ca-central-1 \
   --name operator-ng \
   --nodes 0
+
+
+
+make docker-build docker-push deploy IMG=nghiadang23/my-nginx-operator-image:v1
+
+make deploy IMG=nghiadang23/my-nginx-operator-image:v1
+
+mnt/c/Users/BobDang/Documents/GitHub/The-Kubernetes-Operator-Framework-Book/chap_04
+
+k apply -f config/samples/operator_v1alpha1_nginxoperator.yaml
+
+
+eksctl scale nodegroup \
+  --cluster operator-test \
+  --region ca-central-1 \
+  --name operator-ng \
+  --nodes 0
+
+
+kubectl port-forward -n kube-system svc/kite 8080:8080
+
+cd /mnt/c/Users/BobDang/Documents/GitHub/The-Kubernetes-Operator-Framework-Book/chap_04/nginx-operator
+
+
+make docker-build docker-push deploy & kubectl rollout restart deployment/nginx-operator-controller-manager -n nginx-operator-system
+
+
+make generate & make manifests

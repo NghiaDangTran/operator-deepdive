@@ -17,10 +17,13 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"os"
 	"path/filepath"
+
+	"github.com/operator-framework/operator-lib/leader"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -177,7 +180,13 @@ func main() {
 			config.GetCertificate = metricsCertWatcher.GetCertificate
 		})
 	}
-
+	if !enableLeaderElection {
+		err := leader.Become(context.TODO(), "nginx-lock")
+		if err != nil {
+			setupLog.Error(err, "unable to acquire leader lock")
+			os.Exit(1)
+		}
+	}
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
